@@ -22,14 +22,14 @@ const authOptions = {
           },
         })
 
-        if (!userFound) return null
+        if (!userFound) throw new Error('User not found')
 
         const matchPass = await bcrypt.compare(
           credentials.password,
           userFound.password
         )
 
-        if (!matchPass) return null
+        if (!matchPass) throw new Error('Wrong password')
 
         return {
           id: userFound.id,
@@ -39,6 +39,9 @@ const authOptions = {
       },
     }),
   ],
+  pages: {
+    signIn: '/auth/login',
+  },
 }
 
 const handler = NextAuth(authOptions)

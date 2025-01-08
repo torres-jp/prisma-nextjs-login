@@ -1,5 +1,8 @@
 'use client'
 import { useForm } from 'react-hook-form'
+import { signIn } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 
 function LoginPage() {
   const {
@@ -8,14 +11,33 @@ function LoginPage() {
     formState: { errors },
   } = useForm()
 
-  const onSubmit = handleSubmit((data) => {
-    console.log(data)
+  const [error, setError] = useState(null)
+  const router = useRouter()
+
+  const onSubmit = handleSubmit(async (data) => {
+    const res = await signIn('credentials', {
+      email: data.email,
+      password: data.password,
+      redirect: false,
+    })
+
+    console.log(res)
+
+    if (res.error) {
+      setError(res.error)
+    } else {
+      router.push('/dashboard')
+    }
   })
 
   return (
     <div className='h-[calc(100vh-7rem)] flex items-center justify-center'>
       <form onSubmit={onSubmit} className='w-1/4'>
-        <h1 className='text-slate-200 font-bold text-4xl mb-4'>Register</h1>
+        {error && (
+          <p className='bg-red-500 text-lg text-white p-3 rounded'>{error}</p>
+        )}
+
+        <h1 className='text-slate-200 font-bold text-4xl mb-4'>Login</h1>
 
         <label htmlFor='email' className='text-slate-500 block text-sm mb-2'>
           Email
